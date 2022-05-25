@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI,Request,Response,status,HTTPException, Depends,APIRouter
+from typing import Optional
 from sqlalchemy.orm import Session
 import sys
 import models,schema,oauth2
@@ -10,8 +11,9 @@ router = APIRouter(prefix="/posts",tags=['Posts'])
 
 
 @router.get("/",response_model=List[schema.Post])
-def getPost(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
+def getPost(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),limit: int= 10, skip: int=0,
+search: Optional[str]=''):
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
 # For POST method the frontend sends the data to the API server

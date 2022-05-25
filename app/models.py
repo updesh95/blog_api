@@ -5,6 +5,7 @@ from psycopg2 import Timestamp
 from database import Base
 from sqlalchemy import TIMESTAMP, Column, ForeignKey,Integer, String,Boolean, false
 from sqlalchemy.sql.expression import text
+from sqlalchemy.orm import relationship
 
 class Post(Base):
     __tablename__ = "posts"
@@ -15,9 +16,12 @@ class Post(Base):
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
 
+    owner = relationship("User")
+
 class User(Base):
     __tablename__ = "users"
     email = Column(String,nullable=False,unique=True)
     password = Column(String, nullable=False)
     id= Column(Integer,primary_key=True,nullable= false)
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+
