@@ -7,8 +7,7 @@ from fastapi import Body, Depends, FastAPI,Response,status,HTTPException
 import models
 from database import engine, get_db
 import utils
-import post,user,auth
-
+import post,user,auth,vote
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -26,3 +25,4 @@ async def root():
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(vote.router)
