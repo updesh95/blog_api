@@ -11,12 +11,12 @@ from typing import List
 router = APIRouter(prefix="/posts",tags=['Posts'])
 
 
-@router.get("/",response_model=List[schema.Post])
+@router.get("/",response_model=List[schema.PostOut])
 def getPost(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),limit: int= 10, skip: int=0,
 search: Optional[str]=''):
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id==models.Post.id, isouter=True).group_by(models.Post.id)
-    return posts
+    #posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id==models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    return results
 
 # For POST method the frontend sends the data to the API server
 # GET request is like hey server API send me some data.
@@ -37,7 +37,7 @@ def createPosts(post:schema.PostCreate, db: Session = Depends(get_db),current_us
 
 
 
-@router.get("/{id}",response_model=schema.Post)
+@router.get("/{id}",response_model=schema.PostOut)
 def getpost(id:int , response: Response, db: Session= Depends(get_db)):# this will automatically convert to int and if str is passed it will give a well written error
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
